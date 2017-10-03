@@ -5,7 +5,7 @@ services:
     build: .
     container_name: certbot
     restart: always
-    expose:
+    ports:
       - "80:80"
       - "443:443"
     volumes:
