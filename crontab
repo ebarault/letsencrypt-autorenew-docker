@@ -1,0 +1,1 @@
+* * * * * root . /var/tmp/env.sh; python2.7 /run_letsencrypt.py >> /var/log/letsencrypt.log 2>&1

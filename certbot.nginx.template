@@ -1,0 +1,11 @@
+upstream certbot_upstream {
+  server certbot:80;
+}
+
+server {
+  listen              80;
+  location '/.well-known/acme-challenge' {
+    default_type "text/plain";
+    proxy_pass http://certbot_upstream;
+  }
+}

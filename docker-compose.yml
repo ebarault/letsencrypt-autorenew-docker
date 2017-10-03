@@ -1,0 +1,29 @@
+version: '2'
+
+services:
+  certbot:
+    build: .
+    container_name: certbot
+    restart: always
+    expose:
+      - 80
+      - 443
+    volumes:
+      - ./certs:/certs
+    environment:
+      - DOMAINS=ftp.datagate.lagrangenumerique.fr
+      - EMAIL=eric.barault@gmail.com
+      - DH_PARAMETERS=true
+      - MERGE_KEY_WITH_CERTIFICATE=false
+  nginx:
+    image: nginx
+    container_name: nginx
+    restart: always
+    volumes:
+      - ./certbot.template:/etc/nginx/conf.d/certbot.template
+    ports:
+      - "8080:80"
+    environment:
+      - NGINX_HOST=foobar.com
+      - NGINX_PORT=80
+    command: /bin/bash -c "envsubst < /etc/nginx/conf.d/certbot.nginx.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
