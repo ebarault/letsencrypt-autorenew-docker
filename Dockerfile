@@ -1,6 +1,10 @@
 FROM certbot/certbot
 
-RUN mkdir /certs
+VOLUME /certs
+VOLUME /etc/letsencrypt
+EXPOSE 80
+
+# RUN mkdir /certs
 
 ADD crontab /etc/crontabs
 RUN crontab /etc/crontabs/crontab

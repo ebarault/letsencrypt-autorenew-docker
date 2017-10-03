@@ -43,13 +43,13 @@ def renew_domains():
             print("Running letsencrypt for {}".format(domain))
             regeneratedAnything = True
 
-            exit_code, result = commands.getstatusoutput('certbot --standalone  --preferred-challenges\
-              http-01 --agree-tos --renew-by-default\
+            exit_code, result = commands.getstatusoutput('certbot --non-interactive --standalone\
+              --preferred-challenges http-01 --agree-tos --renew-by-default\
               --staging\
               --server https://acme-staging.api.letsencrypt.org/directory\
               --email $EMAIL -d {} certonly'.format(domain))
-            # exit_code, result = commands.getstatusoutput('certbot --standalone  --preferred-challenges\
-            #   http-01 --agree-tos --renew-by-default\
+            # exit_code, result = commands.getstatusoutput('certbot --non-interactive --standalone\
+            #  --preferred-challenges http-01 --agree-tos --renew-by-default\
             #   --server https://acme-v01.api.letsencrypt.org/directory\
             #   --email $EMAIL -d {} certonly'.format(domain))
             if exit_code > 0:
