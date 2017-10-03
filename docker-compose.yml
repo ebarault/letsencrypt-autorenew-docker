@@ -6,8 +6,8 @@ services:
     container_name: certbot
     restart: always
     expose:
-      - 80
-      - 443
+      - "80:80"
+      - "443:443"
     volumes:
       - ./certs:/certs
     environment:
@@ -20,7 +20,7 @@ services:
     container_name: nginx
     restart: always
     volumes:
-      - ./certbot.template:/etc/nginx/conf.d/certbot.template
+      - ./certbot.nginx.template:/etc/nginx/conf.d/certbot.nginx.template
     ports:
       - "8080:80"
     environment:
