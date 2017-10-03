@@ -1,17 +1,15 @@
-FROM certbot/certbot
+FROM certbot/certbot:v0.18.2
+MAINTAINER Eric Barault (@ebarault)
 
 VOLUME /certs
 VOLUME /etc/letsencrypt
-EXPOSE 80
-
-# RUN mkdir /certs
+EXPOSE 443
 
 ADD crontab /etc/crontabs
 RUN crontab /etc/crontabs/crontab
 
-COPY ./scripts/ /
-RUN chmod +x /run_cron.sh
+COPY ./scripts/ /scripts
+RUN chmod +x /scripts/run_certbot.sh
 
-ENTRYPOINT ["/bin/sh", "-c"]
-
-CMD ["/run_cron.sh"]
+ENTRYPOINT []
+CMD ["crond", "-f"]
