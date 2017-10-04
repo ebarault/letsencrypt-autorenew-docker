@@ -1,6 +1,6 @@
 LOGFILE="/var/log/certrenewal.log"
 
-function logger_error {
+logger_error() {
   if [ -n "${LOGFILE}" ]
   then
     echo "[error] ${1}" >> ${LOGFILE}
@@ -8,7 +8,7 @@ function logger_error {
   >&2 echo "[error] ${1}"
 }
 
-function logger_info {
+logger_info() {
   if [ -n "${LOGFILE}" ]
   then
     echo "[info] ${1}" >> ${LOGFILE}
@@ -17,12 +17,12 @@ function logger_info {
   fi
 }
 
-function issueCertificate {
+issueCertificate() {
 	certbot certonly --agree-tos --renew-by-default --non-interactive --email $EMAIL $args -d $1 &>/dev/null
   return $?
 }
 
-function processCertificates() {
+processCertificates() {
   # Gets the certificate for the domain(s) CERT_DOMAIN (a comma separated list)
   # The certificate will be named after the first domain in the list
   # To work, the following variables must be set:
@@ -33,34 +33,35 @@ function processCertificates() {
 
 	local d=${CERT_DOMAIN} # shorthand
 
-	cert_path=$(find /etc/letsencrypt/live/$d -name cert.pem -print0)
-	if $cert_path; then
-		if ! openssl x509 -noout -checkend $((4*7*86400)) -in "${cert_path}"; then
-    	subject="$(openssl x509 -noout -subject -in "${cert_path}" | grep -o -E 'CN=[^ ,]+' | tr -d 'CN=')"
-    	subjectaltnames="$(openssl x509 -noout -text -in "${cert_path}" | sed -n '/X509v3 Subject Alternative Name/{n;p}' | sed 's/\s//g' | tr -d 'DNS:' | sed 's/,/ /g')"
-    	domains="-d ${subject}"
+  if [ -d /etc/letsencrypt/live/$d ]; then
+  	cert_path=$(find /etc/letsencrypt/live/$d -name cert.pem -print0)
+  	if $cert_path; then
+  		if ! openssl x509 -noout -checkend $((4*7*86400)) -in "${cert_path}"; then
+      	subject="$(openssl x509 -noout -subject -in "${cert_path}" | grep -o -E 'CN=[^ ,]+' | tr -d 'CN=')"
+      	subjectaltnames="$(openssl x509 -noout -text -in "${cert_path}" | sed -n '/X509v3 Subject Alternative Name/{n;p}' | sed 's/\s//g' | tr -d 'DNS:' | sed 's/,/ /g')"
+      	domains="-d ${subject}"
 
-			for name in ${subjectaltnames}; do
-	      if [ "${name}" != "${subject}" ]; then
-	        domains="${domains} -d ${name}"
-	      fi
-	    done
+  			for name in ${subjectaltnames}; do
+  	      if [ "${name}" != "${subject}" ]; then
+  	        domains="${domains} -d ${name}"
+  	      fi
+  	    done
 
-			# renewing certificate
-			logger_info "Renewing certificate for $domains"
-			issueCertificate "${domains}"
+  			# renewing certificate
+  			logger_info "Renewing certificate for $domains"
+  			issueCertificate "${domains}"
 
-	    if [ $? -ne 0 ]; then
-	      logger_error "failed to renew certificate! check /var/log/letsencrypt/letsencrypt.log!"
-	      exitcode=1
-	    else
-	      renewed_certs+=("$subject")
-	      logger_info "renewed certificate for ${subject}"
-	    fi
+  	    if [ $? -ne 0 ]; then
+  	      logger_error "failed to renew certificate! check /var/log/letsencrypt/letsencrypt.log!"
+  	      exitcode=1
+  	    else
+  	      logger_info "renewed certificate for ${subject}"
+  	    fi
 
-	  else
-	    logger_info "certificate for $d does not require renewal"
-	  fi
+  	  else
+  	    logger_info "certificate for $d does not require renewal"
+  	  fi
+    fi
 	else
 		logger_info "Getting certificate for $CERT_DOMAIN"
 		issueCertificate "${CERT_DOMAIN}"

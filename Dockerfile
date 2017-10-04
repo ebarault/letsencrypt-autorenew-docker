@@ -5,6 +5,9 @@ VOLUME /certs
 VOLUME /etc/letsencrypt
 EXPOSE 443
 
+RUN apk update && \
+	apk add openssl
+
 ADD crontab /etc/crontabs
 RUN crontab /etc/crontabs/crontab
 
