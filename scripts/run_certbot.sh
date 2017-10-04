@@ -38,6 +38,7 @@ processCertificates() {
   if [ -d /etc/letsencrypt/live/$d ]; then
     cert_path=$(find /etc/letsencrypt/live/$d -name cert.pem -print0)
     if [ $cert_path ]; then
+      # check for certificates expiring in less that 28 days
       if ! openssl x509 -noout -checkend $((4*7*86400)) -in "${cert_path}"; then
         subject="$(openssl x509 -noout -subject -in "${cert_path}" | grep -o -E 'CN=[^ ,]+' | tr -d 'CN=')"
         subjectaltnames="$(openssl x509 -noout -text -in "${cert_path}" | sed -n '/X509v3 Subject Alternative Name/{n;p}' | sed 's/\s//g' | tr -d 'DNS:' | sed 's/,/ /g')"
