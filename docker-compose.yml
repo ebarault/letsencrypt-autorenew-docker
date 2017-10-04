@@ -16,4 +16,3 @@ services:
       - STAGING=true
       - DOMAINS=ftp.datagate.lagrangenumerique.fr
       - EMAIL=eric.barault@gmail.com
-      - CONCAT=false

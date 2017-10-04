@@ -12,7 +12,6 @@ ADD crontab /etc/crontabs
 RUN crontab /etc/crontabs/crontab
 
 COPY ./scripts/ /scripts
-RUN chmod +x /scripts/run_certbot.sh
+RUN chmod -R +x /scripts/
 
-ENTRYPOINT []
-CMD ["crond", "-f"]
+ENTRYPOINT ["/scripts/entrypoint.sh"]
