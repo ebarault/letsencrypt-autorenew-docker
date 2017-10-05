@@ -9,6 +9,7 @@ services:
     volumes:
       - ./certs:/certs
       - ./letsencrypt:/etc/letsencrypt
+      - ./var_log_letsencrypt:/var/log/letsencrypt
     restart: always
     environment:
       #- WEBROOT=""

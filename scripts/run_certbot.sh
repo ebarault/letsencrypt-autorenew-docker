@@ -1,6 +1,6 @@
 #!/bin/sh
 
-LOGFILE="/var/log/certrenewal.log"
+LOGFILE="/var/log/letsencrypt/certrenewal.log"
 
 logger_error() {
   if [ -n "${LOGFILE}" ]
@@ -79,7 +79,7 @@ processCertificates() {
         cat /etc/letsencrypt/live/$d/fullchain.pem /etc/letsencrypt/live/$d/privkey.pem > /certs/$d.pem
       else
         # keep full chain and private key in separate files (e.g. for nginx and apache)
-        cp /etc/letsencrypt/live/$d/fullchain.pem /certs/$d.pem
+        cp /etc/letsencrypt/live/$d/cert.pem /certs/$d.pem
         cp /etc/letsencrypt/live/$d/privkey.pem /certs/$d.key.pem
         cp /etc/letsencrypt/live/$d/chain.pem /certs/$d.chain.pem
         cp /etc/letsencrypt/live/$d/fullchain.pem /certs/$d.fullchain.pem
