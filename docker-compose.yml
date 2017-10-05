@@ -14,6 +14,6 @@ services:
       #- WEBROOT=""
       - DEBUG=false
       - STAGING=true
-      - DOMAINS=ftp.datagate.lagrangenumerique.fr
-      - EMAIL=eric.barault@gmail.com
+      - DOMAINS=my.domain.com
+      - EMAIL=user@my.domain.com
       - CONCAT=false
