@@ -1,13 +1,13 @@
 #!/bin/sh
 
-LOGFILE="/var/log/letsencrypt/certrenewal.log"
+# LOGFILE="/var/log/letsencrypt/certrenewal.log"
 
 logger_error() {
   if [ -n "${LOGFILE}" ]
   then
     echo "[error] ${1}" >> ${LOGFILE}
   fi
-  >&2 echo "[error] ${1}"
+  >&2 echo "[error] ${1}" > /proc/1/fd/1 2>/proc/1/fd/2
 }
 
 logger_info() {
@@ -15,12 +15,12 @@ logger_info() {
   then
     echo "[info] ${1}" >> ${LOGFILE}
   else
-    echo "[info] ${1}"
+    echo "[info] ${1}" > /proc/1/fd/1 2>/proc/1/fd/2
   fi
 }
 
 issueCertificate() {
-  certbot certonly --agree-tos --renew-by-default --non-interactive --email $EMAIL $args -d $1 &>/dev/null
+  certbot certonly --agree-tos --renew-by-default --non-interactive --max-log-backups 100 --email $EMAIL $args -d $1 &>/dev/null
   return $?
 }
 

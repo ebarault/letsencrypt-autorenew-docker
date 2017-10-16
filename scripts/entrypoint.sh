@@ -10,6 +10,9 @@ until [ $(curl -s -L --head --fail -o /dev/null -w '%{http_code}\n' --connect-ti
   # -o = Redirects the HTML output to /dev/null
 done
 
+echo ""
+echo "$HEALTH_CHECK_URL is online, running certbot"
+
 # one-time execution at container start once host's health check is ok
 /scripts/run_certbot.sh
 

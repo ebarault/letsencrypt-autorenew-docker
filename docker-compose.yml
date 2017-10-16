@@ -12,10 +12,11 @@ services:
       - ./var_log_letsencrypt:/var/log/letsencrypt
     restart: always
     environment:
-      #- WEBROOT=""
+      #- WEBROOT=
       - DEBUG=false
       - STAGING=true
       - DOMAINS=my.domain.com
       - EMAIL=user@my.domain.com
       - CONCAT=false
       - HEALTH_CHECK_URL=my.domain.com:80
+      # - LOGFILE=/var/log/letsencrypt/certrenewal.log
