@@ -18,3 +18,4 @@ services:
       - DOMAINS=my.domain.com
       - EMAIL=user@my.domain.com
       - CONCAT=false
+      - HEALTH_CHECK_URL=my.domain.com:80
