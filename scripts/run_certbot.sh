@@ -1,12 +1,14 @@
 #!/bin/sh
 
-# LOGFILE="/var/log/letsencrypt/certrenewal.log"
+# boostrapped from https://github.com/janeczku/haproxy-acme-validation-plugin/blob/master/cert-renewal-haproxy.sh
 
 logger_error() {
   if [ -n "${LOGFILE}" ]
   then
     echo "[error] ${1}" >> ${LOGFILE}
   fi
+  # make sure the job redirects directly to stdout/stderr instead of a log file
+  # this works well in docker combined with a docker logging driver
   >&2 echo "[error] ${1}" > /proc/1/fd/1 2>/proc/1/fd/2
 }
 
@@ -15,23 +17,25 @@ logger_info() {
   then
     echo "[info] ${1}" >> ${LOGFILE}
   else
+    # make sure the job redirects directly to stdout/stderr instead of a log file
+    # this works well in docker combined with a docker logging driver
     echo "[info] ${1}" > /proc/1/fd/1 2>/proc/1/fd/2
   fi
 }
 
 issueCertificate() {
-  certbot certonly --agree-tos --renew-by-default --non-interactive --max-log-backups 100 --email $EMAIL $args -d $1 &>/dev/null
+  certbot certonly --agree-tos --renew-by-default --non-interactive --max-log-backups 100 --email $EMAIL $CERTBOT_ARGS -d $1 &>/dev/null
   return $?
 }
 
 processCertificates() {
-  # Gets the certificate for the domain(s) CERT_DOMAIN (a comma separated list)
+  # Get the certificate for the domain(s) CERT_DOMAIN (a comma separated list)
   # The certificate will be named after the first domain in the list
   # To work, the following variables must be set:
   # - CERT_DOMAIN : comma separated list of domains
   # - EMAIL
   # - CONCAT
-  # - args
+  # - CERTBOT_ARGS
 
   local d=${CERT_DOMAIN} # shorthand
 
@@ -67,6 +71,7 @@ processCertificates() {
       fi
     fi
   else
+    # initial certificate request
     logger_info "Getting certificate for $CERT_DOMAIN"
     issueCertificate "${CERT_DOMAIN}"
 
@@ -74,7 +79,8 @@ processCertificates() {
       logger_error "Failed to request certificate! check /var/log/letsencrypt/letsencrypt.log!"
       exitcode=1
     else
-      if $CONCAT; then
+      # certs are copied to /certs directory
+      if [ "$CONCAT" = true ]; then
         # concat the full chain with the private key (e.g. for haproxy)
         cat /etc/letsencrypt/live/$d/fullchain.pem /etc/letsencrypt/live/$d/privkey.pem > /certs/$d.pem
       else
@@ -89,24 +95,50 @@ processCertificates() {
   fi
 }
 
-args=""
+## ================================== MAIN ================================== ##
+
+# bootstrap a list of optional arguments for certbot
+CERTBOT_ARGS=""
+
+##
+# trigger certbot's webroot / standalone plugin
+#
+# `webroot` plugin is recommended when you already have a web server running
+# $WEBROOT should be set to the existing web server's root for certbot to use this mode
+# see https://certbot.eff.org/docs/using.html#webroot
+#
+# `standlone` plugin runs a built-in “standalone” web server to obtain the certificate
+# --preferred-challenges tls-sni` option is set to use port 443
+# this mode is triggered when $WEBROOT is not set
+# see https://certbot.eff.org/docs/using.html#standalone
+#
 if [ $WEBROOT ]; then
-  args=" --webroot -w $WEBROOT"
+  CERTBOT_ARGS=" --webroot -w $WEBROOT"
 else
-  args=" --standalone --preferred-challenges tls-sni"
+  CERTBOT_ARGS=" --standalone --preferred-challenges tls-sni"
 fi
 
-if $DEBUG; then
-  args=$args" --debug"
+# activate debug mode
+if [ "$DEBUG" = true ]; then
+  CERTBOT_ARGS=$CERTBOT_ARGS" --debug"
 fi
 
-if $STAGING; then
-  args=$args" --staging"
+# activate staging mode where test certificates (invalid) are requested against
+# letsencrypt's staging server https://acme-staging.api.letsencrypt.org/directory.
+# This is useful for testing purposes without being rate limited by letsencrypt
+if [ "$STAGING" = true ]; then
+  CERTBOT_ARGS=$CERTBOT_ARGS" --staging"
 fi
 
 NOW=$(date +"%D %T")
 logger_info "$NOW: Checking certificates for domains $DOMAINS"
 
+##
+# extract certificate domains and run main routine on each
+# $DOMAINS is expected to be space separated list of domains such as in "foo bar baz"
+# each domains subset can be composed of several domains in case of multi-host domains,
+# they are expected to be comma separated, such as in "foo bar,bat baz"
+#
 for d in $DOMAINS; do
   CERT_DOMAIN=$d
   processCertificates

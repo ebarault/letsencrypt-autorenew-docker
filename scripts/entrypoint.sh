@@ -1,6 +1,7 @@
 #!/bin/sh
 echo "Waiting for $HEALTH_CHECK_URL to be online"
 
+# Wait until the server at the provided $HEALTH_CHECK_URL is up before actually running certbot
 until [ $(curl -s -L --head --fail -o /dev/null -w '%{http_code}\n' --connect-timeout 3 --max-time 5 $HEALTH_CHECK_URL) -eq 200 ]; do
   printf '.'
   sleep 5
