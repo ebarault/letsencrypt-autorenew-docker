@@ -28,6 +28,24 @@ issueCertificate() {
   return $?
 }
 
+copyCertificate() {
+  local d=${CERT_DOMAIN} # shorthand
+
+  # certs are copied to /certs directory
+  if [ "$CONCAT" = true ]; then
+   # concat the full chain with the private key (e.g. for haproxy)
+   cat /etc/letsencrypt/live/$d/fullchain.pem /etc/letsencrypt/live/$d/privkey.pem > /certs/$d.pem
+   logger_info "Certificates for $d concatenated and copied to /certs dir"
+  else
+   # keep full chain and private key in separate files (e.g. for nginx and apache)
+   cp /etc/letsencrypt/live/$d/cert.pem /certs/$d.pem
+   cp /etc/letsencrypt/live/$d/privkey.pem /certs/$d.key.pem
+   cp /etc/letsencrypt/live/$d/chain.pem /certs/$d.chain.pem
+   cp /etc/letsencrypt/live/$d/fullchain.pem /certs/$d.fullchain.pem
+   logger_info "Certificates for $d and copied to /certs dir"
+  fi
+}
+
 processCertificates() {
   # Get the certificate for the domain(s) CERT_DOMAIN (a comma separated list)
   # The certificate will be named after the first domain in the list
@@ -64,6 +82,7 @@ processCertificates() {
           exitcode=1
         else
           logger_info "Renewed certificate for ${subject}"
+          copyCertificate
         fi
 
       else
@@ -79,18 +98,8 @@ processCertificates() {
       logger_error "Failed to request certificate! check /var/log/letsencrypt/letsencrypt.log!"
       exitcode=1
     else
-      # certs are copied to /certs directory
-      if [ "$CONCAT" = true ]; then
-        # concat the full chain with the private key (e.g. for haproxy)
-        cat /etc/letsencrypt/live/$d/fullchain.pem /etc/letsencrypt/live/$d/privkey.pem > /certs/$d.pem
-      else
-        # keep full chain and private key in separate files (e.g. for nginx and apache)
-        cp /etc/letsencrypt/live/$d/cert.pem /certs/$d.pem
-        cp /etc/letsencrypt/live/$d/privkey.pem /certs/$d.key.pem
-        cp /etc/letsencrypt/live/$d/chain.pem /certs/$d.chain.pem
-        cp /etc/letsencrypt/live/$d/fullchain.pem /certs/$d.fullchain.pem
-      fi
       logger_info "Certificate delivered for $CERT_DOMAIN"
+      copyCertificate
     fi
   fi
 }
