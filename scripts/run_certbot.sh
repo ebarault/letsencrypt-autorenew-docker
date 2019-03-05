@@ -117,14 +117,15 @@ CERTBOT_ARGS=""
 # see https://certbot.eff.org/docs/using.html#webroot
 #
 # `standlone` plugin runs a built-in “standalone” web server to obtain the certificate
-# --preferred-challenges tls-sni` option is set to use port 443
-# this mode is triggered when $WEBROOT is not set
+# The current implementation supports the http-01, dns-01 and tls-alpn-01 challenges and
+# defaults to http-01 since tls-sni-01 has been deprecated
+# This mode is triggered when $WEBROOT is not set
 # see https://certbot.eff.org/docs/using.html#standalone
 #
 if [ $WEBROOT ]; then
   CERTBOT_ARGS=" --webroot -w $WEBROOT"
 else
-  CERTBOT_ARGS=" --standalone --preferred-challenges tls-sni"
+  CERTBOT_ARGS=" --standalone --preferred-challenges ${PREFERRED_CHALLENGES:-http-01}"
 fi
 
 # activate debug mode
