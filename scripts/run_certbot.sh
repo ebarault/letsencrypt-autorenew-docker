@@ -24,8 +24,10 @@ logger_info() {
 }
 
 issueCertificate() {
-  certbot certonly --agree-tos --renew-by-default --non-interactive --max-log-backups 100 --email $EMAIL $CERTBOT_ARGS -d $1 &>/dev/null
-  return $?
+  certbot_response=`certbot certonly --agree-tos --renew-by-default --non-interactive --max-log-backups 100 --email $EMAIL $CERTBOT_ARGS -d $1 2>&1`
+  certbot_return_code=$?
+  logger_info "${certbot_response}"
+  return ${certbot_return_code}
 }
 
 copyCertificate() {
@@ -73,7 +75,7 @@ processCertificates() {
               domains="${domains} -d ${altname}"
             else
               domains="${altname}"
-            fi   
+            fi
           fi
         done
 
