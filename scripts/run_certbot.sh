@@ -69,7 +69,11 @@ processCertificates() {
         # look for certificate additional domain names and append them as '-d <name>' (-d for certbot's --domains option)
         for altname in ${subjectaltnames}; do
           if [ "${altname}" != "${subject}" ]; then
-            domains="${domains} -d ${altname}"
+            if [ "${domains}" != "" ]; then
+              domains="${domains} -d ${altname}"
+            else
+              domains="${altname}"
+            fi   
           fi
         done
 
