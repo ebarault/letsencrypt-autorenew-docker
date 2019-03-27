@@ -31,7 +31,7 @@ issueCertificate() {
 }
 
 copyCertificate() {
-  local d=${CERT_DOMAIN} # shorthand
+  local d=${CERT_DOMAIN%%,*} # in case of multi-host domains, use first name only
 
   # certs are copied to /certs directory
   if [ "$CONCAT" = true ]; then
@@ -57,7 +57,7 @@ processCertificates() {
   # - CONCAT
   # - CERTBOT_ARGS
 
-  local d=${CERT_DOMAIN} # shorthand
+  local d=${CERT_DOMAIN%%,*} # in case of multi-host domains, use first name only
 
   if [ -d /etc/letsencrypt/live/$d ]; then
     cert_path=$(find /etc/letsencrypt/live/$d -name cert.pem -print0)
