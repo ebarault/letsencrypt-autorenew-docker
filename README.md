@@ -39,8 +39,8 @@ The following volumes of interest can be mounted on the docker host or as docker
 - **PREFERRED_CHALLENGES** : (optional, defaults to http-01) A sorted, comma delimited list of the preferred challenge to use during authorization with the most preferred challenge listed first (eg. "dns" or "tls-alpn-01,http,dns"). NOTE: tls-alpn-01 challenge is yet not supported by certbot 0.31.0
 - **CUSTOM_ARGS** : (optional) Additional `certbot` command-line options (e.g. `--redirect`), refer to certbot [documentation](https://certbot.eff.org/docs/using.html#certbot-command-line-options)
 - **LOGFILE** : (optional) path of a file where to write the logs from the certificate request/renewal script. When not provided both stdout/stderr are directed to console which is convenient when using a docker log driver
-- **DEBUG** : (optional) whether to run letsencrypt in debug mode, refer to certbot [documentation] (https://certbot.eff.org/docs/using.html#certbot-command-line-options)
-- **STAGING** : (optional) whether to run letsencrypt in staging mode, refer to certbot [documentation] (https://certbot.eff.org/docs/using.html#certbot-command-line-options)
+- **DEBUG** : (optional) whether to run letsencrypt in debug mode, refer to certbot [documentation](https://certbot.eff.org/docs/using.html#certbot-command-line-options)
+- **STAGING** : (optional) whether to run letsencrypt in staging mode, refer to certbot [documentation](https://certbot.eff.org/docs/using.html#certbot-command-line-options)
 - **DOMAINS** : space separated list of comma separated subdomains to register the certificate with, for example:
   - `my.domain.com`
   - `sub.domain1.com,sub.domain2.com`
