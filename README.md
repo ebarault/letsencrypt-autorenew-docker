@@ -35,10 +35,9 @@ The following volumes of interest can be mounted on the docker host or as docker
 
 #### Environment variables:
 - **WEBROOT** : (optional) path to the host's web server root. If provided, letsencrypt will use the given existing web server to request and validate the certificates. If not provided, letsencrypt will launch it's own web server for this purpose
-- **PLUGIN** : (optional, defaults to `standalone`) A `certbot` plugin to use (e.g. `standalone`, `manual`)
+- **PLUGIN** : (optional, defaults to `standalone`) A `certbot` plugin to use (e.g. `manual`)
 - **PREFERRED_CHALLENGES** : (optional, defaults to http-01) A sorted, comma delimited list of the preferred challenge to use during authorization with the most preferred challenge listed first (eg. "dns" or "tls-alpn-01,http,dns"). NOTE: tls-alpn-01 challenge is yet not supported by certbot 0.31.0
 - **CUSTOM_ARGS** : (optional) Additional `certbot` command-line options (e.g. `--redirect`), refer to certbot [documentation](https://certbot.eff.org/docs/using.html#certbot-command-line-options)
-- **PLUGIN** : (optional, defaults to `standalone`) A `certbot` plugin to use (e.g. `standalone`, `manual`)
 - **LOGFILE** : (optional) path of a file where to write the logs from the certificate request/renewal script. When not provided both stdout/stderr are directed to console which is convenient when using a docker log driver
 - **DEBUG** : (optional) whether to run letsencrypt in debug mode, refer to certbot [documentation] (https://certbot.eff.org/docs/using.html#certbot-command-line-options)
 - **STAGING** : (optional) whether to run letsencrypt in staging mode, refer to certbot [documentation] (https://certbot.eff.org/docs/using.html#certbot-command-line-options)
