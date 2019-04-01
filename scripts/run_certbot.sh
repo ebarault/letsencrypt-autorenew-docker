@@ -131,7 +131,7 @@ CERTBOT_ARGS=""
 if [ $WEBROOT ]; then
   CERTBOT_ARGS=" --webroot -w $WEBROOT"
 else
-  CERTBOT_ARGS=" --standalone --preferred-challenges ${PREFERRED_CHALLENGES:-http-01}"
+  CERTBOT_ARGS=" --${PLUGIN:-standalone} --preferred-challenges ${PREFERRED_CHALLENGES:-http-01} ${CUSTOM_ARGS}"
 fi
 
 # activate debug mode
