@@ -32,6 +32,7 @@ issueCertificate() {
 
 copyCertificate() {
   local d=${CERT_DOMAIN%%,*} # in case of multi-host domains, use first name only
+  local d=$(echo "${d}" | sed "s/\(\*\.\)?*\(.*\)/\2/") # support wildcard hosts
 
   # certs are copied to /certs directory
   if [ "$CONCAT" = true ]; then
@@ -58,6 +59,7 @@ processCertificates() {
   # - CERTBOT_ARGS
 
   local d=${CERT_DOMAIN%%,*} # in case of multi-host domains, use first name only
+  local d=$(echo "${d}" | sed "s/\(\*\.\)?*\(.*\)/\2/") # support wildcard hosts
 
   if [ -d /etc/letsencrypt/live/$d ]; then
     cert_path=$(find /etc/letsencrypt/live/$d -name cert.pem -print0)
